@@ -1,0 +1,10 @@
+.project
+.classpath
+.ll
+.o
+.iml
+.py
+/bin
+/.idea
+/out
+/output
