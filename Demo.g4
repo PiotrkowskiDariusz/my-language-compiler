@@ -3,9 +3,38 @@ grammar Demo;
 start: ( stat? NEWLINE )*
 ;
 
-stat: 	ID '=' expr		#assign
-	| PRINT ID		    #print
-	| READ ID		    #read
+block: ( stat? NEWLINE )*
+;
+
+stat: IF equal THEN blockif ENDIF 	#if
+    | REPEAT repetitions block ENDREPEAT	#repeat
+	| PRINT ID			    #print
+	| ID '=' expr			#assign
+	| READ ID   			#read
+;
+
+repetitions: expr
+;
+
+REPEAT:	'repeat'
+;
+
+ENDREPEAT: 'endrepeat'
+;
+
+blockif: block
+;
+
+equal: ID '==' expr
+;
+
+IF:	'if'
+;
+
+THEN:	'then'
+;
+
+ENDIF:	'endif'
 ;
 
 expr: expr1			    #single1

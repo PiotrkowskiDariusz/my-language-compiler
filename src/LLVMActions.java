@@ -21,6 +21,7 @@ public class LLVMActions extends DemoBaseListener {
     
     HashMap<String, VarType> variables = new HashMap<String, VarType>();
     Stack<Value> stack = new Stack<Value>();
+    String value;
 
     @Override
     public void exitAssign(DemoParser.AssignContext ctx) {
@@ -135,6 +136,50 @@ public class LLVMActions extends DemoBaseListener {
             LLVMGenerator.declare_i32(ID);
         }
         LLVMGenerator.scanf(ID);
+    }
+
+    @Override
+    public void exitIf(DemoParser.IfContext ctx) {
+    }
+
+    @Override
+    public void enterBlockif(DemoParser.BlockifContext ctx) {
+        LLVMGenerator.ifstart();
+    }
+
+    @Override
+    public void exitBlockif(DemoParser.BlockifContext ctx) {
+        LLVMGenerator.ifend();
+    }
+
+    @Override
+    public void exitEqual(DemoParser.EqualContext ctx) {
+        String ID = ctx.ID().getText();
+        String INT = ctx.expr().getText();
+        if( variables.containsKey(ID) ) {
+            LLVMGenerator.icmp( ID, INT );
+        } else {
+            ctx.getStart().getLine();
+            System.err.println("Line "+ ctx.getStart().getLine()+", unknown variable: "+ID);
+        }
+    }
+
+    /*@Override
+    public void exitRepetitions(DemoParser.RepetitionsContext ctx) {
+        LLVMGenerator.repeatstart(value);
+    }*/
+
+    @Override
+    public void exitRepetitions(DemoParser.RepetitionsContext ctx) {
+        Value v = stack.pop();
+        LLVMGenerator.repeatstart(v.name);
+    }
+
+    @Override
+    public void exitBlock(DemoParser.BlockContext ctx) {
+        if( ctx.getParent() instanceof DemoParser.RepeatContext ){
+            LLVMGenerator.repeatend();
+        }
     }
 
    void error(int line, String msg){

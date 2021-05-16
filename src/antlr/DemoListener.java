@@ -17,17 +17,39 @@ public interface DemoListener extends ParseTreeListener {
 	 */
 	void exitStart(DemoParser.StartContext ctx);
 	/**
-	 * Enter a parse tree produced by the {@code assign}
-	 * labeled alternative in {@link DemoParser#stat}.
+	 * Enter a parse tree produced by {@link DemoParser#block}.
 	 * @param ctx the parse tree
 	 */
-	void enterAssign(DemoParser.AssignContext ctx);
+	void enterBlock(DemoParser.BlockContext ctx);
 	/**
-	 * Exit a parse tree produced by the {@code assign}
+	 * Exit a parse tree produced by {@link DemoParser#block}.
+	 * @param ctx the parse tree
+	 */
+	void exitBlock(DemoParser.BlockContext ctx);
+	/**
+	 * Enter a parse tree produced by the {@code if}
 	 * labeled alternative in {@link DemoParser#stat}.
 	 * @param ctx the parse tree
 	 */
-	void exitAssign(DemoParser.AssignContext ctx);
+	void enterIf(DemoParser.IfContext ctx);
+	/**
+	 * Exit a parse tree produced by the {@code if}
+	 * labeled alternative in {@link DemoParser#stat}.
+	 * @param ctx the parse tree
+	 */
+	void exitIf(DemoParser.IfContext ctx);
+	/**
+	 * Enter a parse tree produced by the {@code repeat}
+	 * labeled alternative in {@link DemoParser#stat}.
+	 * @param ctx the parse tree
+	 */
+	void enterRepeat(DemoParser.RepeatContext ctx);
+	/**
+	 * Exit a parse tree produced by the {@code repeat}
+	 * labeled alternative in {@link DemoParser#stat}.
+	 * @param ctx the parse tree
+	 */
+	void exitRepeat(DemoParser.RepeatContext ctx);
 	/**
 	 * Enter a parse tree produced by the {@code print}
 	 * labeled alternative in {@link DemoParser#stat}.
@@ -41,6 +63,18 @@ public interface DemoListener extends ParseTreeListener {
 	 */
 	void exitPrint(DemoParser.PrintContext ctx);
 	/**
+	 * Enter a parse tree produced by the {@code assign}
+	 * labeled alternative in {@link DemoParser#stat}.
+	 * @param ctx the parse tree
+	 */
+	void enterAssign(DemoParser.AssignContext ctx);
+	/**
+	 * Exit a parse tree produced by the {@code assign}
+	 * labeled alternative in {@link DemoParser#stat}.
+	 * @param ctx the parse tree
+	 */
+	void exitAssign(DemoParser.AssignContext ctx);
+	/**
 	 * Enter a parse tree produced by the {@code read}
 	 * labeled alternative in {@link DemoParser#stat}.
 	 * @param ctx the parse tree
@@ -52,6 +86,36 @@ public interface DemoListener extends ParseTreeListener {
 	 * @param ctx the parse tree
 	 */
 	void exitRead(DemoParser.ReadContext ctx);
+	/**
+	 * Enter a parse tree produced by {@link DemoParser#repetitions}.
+	 * @param ctx the parse tree
+	 */
+	void enterRepetitions(DemoParser.RepetitionsContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link DemoParser#repetitions}.
+	 * @param ctx the parse tree
+	 */
+	void exitRepetitions(DemoParser.RepetitionsContext ctx);
+	/**
+	 * Enter a parse tree produced by {@link DemoParser#blockif}.
+	 * @param ctx the parse tree
+	 */
+	void enterBlockif(DemoParser.BlockifContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link DemoParser#blockif}.
+	 * @param ctx the parse tree
+	 */
+	void exitBlockif(DemoParser.BlockifContext ctx);
+	/**
+	 * Enter a parse tree produced by {@link DemoParser#equal}.
+	 * @param ctx the parse tree
+	 */
+	void enterEqual(DemoParser.EqualContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link DemoParser#equal}.
+	 * @param ctx the parse tree
+	 */
+	void exitEqual(DemoParser.EqualContext ctx);
 	/**
 	 * Enter a parse tree produced by the {@code single1}
 	 * labeled alternative in {@link DemoParser#expr}.
