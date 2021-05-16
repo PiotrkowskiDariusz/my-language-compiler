@@ -1,9 +1,8 @@
-.jar
+.project
+.classpath
 .ll
 .o
 .iml
-.project
-.classpath
 .py
 /bin
 /.idea
