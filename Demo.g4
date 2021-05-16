@@ -1,6 +1,6 @@
 grammar Demo;
 
-start: ( stat? NEWLINE )*
+start: ( (stat|function)? NEWLINE )*
 ;
 
 block: ( stat? NEWLINE )*
@@ -9,23 +9,46 @@ block: ( stat? NEWLINE )*
 stat: IF equal THEN blockif ENDIF 	#if
     | REPEAT repetitions block ENDREPEAT	#repeat
 	| PRINT ID			    #print
-	| ID '=' expr			#assign
+	| ID '=' value			#assign
 	| READ ID   			#read
+	| ID                    #call
 ;
 
-repetitions: expr
+function: FUNCTION fparam fblock ENDFUNCTION
+;
+
+fparam: ID
+;
+
+fblock: block
+;
+
+repetitions: value
+;
+
+blockif: block
+;
+
+equal: ID '==' INT
+;
+
+value: INT			            #int
+       | ID			            #id
+       | DOUBLE			        #double
+       | value ADD value		#add
+       | value MULT value		#mult
+;
+
+FUNCTION: 'function'
+;
+
+ENDFUNCTION: 'endfunction'
 ;
 
 REPEAT:	'repeat'
 ;
 
 ENDREPEAT: 'endrepeat'
-;
-
-blockif: block
-;
-
-equal: ID '==' expr
 ;
 
 IF:	'if'
@@ -35,18 +58,6 @@ THEN:	'then'
 ;
 
 ENDIF:	'endif'
-;
-
-expr: expr1			    #single1
-	| expr1 ADD expr1	#add
-;
-
-expr1: expr2            #single2
-	| expr2 MULT expr2	# mult
-;
-
-expr2: INT			    # int
-	| DOUBLE		    # double
 ;
 
 PRINT: 'print'

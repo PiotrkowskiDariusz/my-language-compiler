@@ -4,9 +4,10 @@ import antlr.DemoParser;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Stack;
 
-enum VarType{ INT, DOUBLE, UNKNOWN }
+enum VarType{ INT, DOUBLE, ID, UNKNOWN }
 
 class Value{ 
 	public String name;
@@ -18,28 +19,36 @@ class Value{
 }
 
 public class LLVMActions extends DemoBaseListener {
-    
-    HashMap<String, VarType> variables = new HashMap<String, VarType>();
+
+    HashMap<String, VarType> globals = new HashMap<String, VarType>();
+    HashMap<String, VarType> locals = new HashMap<String, VarType>();
+    HashSet<String> funcs = new HashSet<String>();
     Stack<Value> stack = new Stack<Value>();
+    Boolean glob;
     String value;
+    String function;
+
+    /*@Override
+    public void exitStart(DemoParser.StartContext ctx) {
+        try {
+            FileWriter writer = new FileWriter("test.ll");
+            writer.write(LLVMGenerator.generate());
+            writer.close();
+        }
+        catch (IOException e) {
+            e.printStackTrace();
+        }
+        System.out.println( LLVMGenerator.generate() );
+    }*/
 
     @Override
-    public void exitAssign(DemoParser.AssignContext ctx) {
-       String ID = ctx.ID().getText();
-       Value v = stack.pop();
-       variables.put(ID, v.type);
-       if( v.type == VarType.INT ){
-         LLVMGenerator.declare_i32(ID);
-         LLVMGenerator.assign_i32(ID, v.name);
-       } 
-       if( v.type == VarType.DOUBLE ){
-         LLVMGenerator.declare_double(ID);
-         LLVMGenerator.assign_double(ID, v.name);
-       } 
+    public void enterStart(DemoParser.StartContext ctx) {
+        glob = true;
     }
 
-    @Override 
+    @Override
     public void exitStart(DemoParser.StartContext ctx) {
+        LLVMGenerator.close_main();
         try {
             FileWriter writer = new FileWriter("test.ll");
             writer.write(LLVMGenerator.generate());
@@ -51,6 +60,37 @@ public class LLVMActions extends DemoBaseListener {
         System.out.println( LLVMGenerator.generate() );
     }
 
+    @Override
+    public void exitId(DemoParser.IdContext ctx) {
+        if( ctx.ID() != null ){
+            String ID = ctx.ID().getText();
+
+            if( locals.containsKey(ID) ) {
+                LLVMGenerator.load_i32( "%"+ID );
+            } else if( globals.containsKey(ID) ) {
+                LLVMGenerator.load_i32( "@"+ID );
+            } else if( funcs.contains(ID) ) {
+                LLVMGenerator.call(ID);
+            } else {
+                error(ctx.getStart().getLine(), "Unknown "+ID+ ": local > global > function");
+            }
+            stack.push( new Value("%"+(LLVMGenerator.reg-1), VarType.ID) );
+        }
+    }
+
+    @Override
+    public void exitAssign(DemoParser.AssignContext ctx) {
+        String ID = ctx.ID().getText();
+        Value v = stack.pop();
+
+        if( v.type == VarType.INT ){
+            LLVMGenerator.assign_i32(set_variable(ID, v.type), v.name);
+        }
+        if( v.type == VarType.DOUBLE ){
+            LLVMGenerator.assign_double(set_variable(ID, v.type), v.name);
+        }
+    }
+
     @Override 
     public void exitInt(DemoParser.IntContext ctx) { 
          stack.push( new Value(ctx.INT().getText(), VarType.INT) );       
@@ -59,19 +99,19 @@ public class LLVMActions extends DemoBaseListener {
     @Override 
     public void exitDouble(DemoParser.DoubleContext ctx) {
          stack.push( new Value(ctx.DOUBLE().getText(), VarType.DOUBLE) );
-    } 
+    }
 
     @Override 
     public void exitAdd(DemoParser.AddContext ctx) { 
        Value v1 = stack.pop();
        Value v2 = stack.pop();
        if( v1.type == v2.type ) {
-	  if( v1.type == VarType.INT ){
-             LLVMGenerator.add_i32(v1.name, v2.name); 
-             stack.push( new Value("%"+(LLVMGenerator.reg-1), VarType.INT) ); 
+	   if( v1.type == VarType.INT ){
+             LLVMGenerator.add_i32(v1.name, v2.name);
+             stack.push( new Value("%"+(LLVMGenerator.reg-1), VarType.INT) );
           }
-	  if( v1.type == VarType.DOUBLE ){
-             LLVMGenerator.add_double(v1.name, v2.name); 
+	   if( v1.type == VarType.DOUBLE ){
+             LLVMGenerator.add_double(v1.name, v2.name);
              stack.push( new Value("%"+(LLVMGenerator.reg-1), VarType.DOUBLE) );
          }
        } else {
@@ -84,11 +124,11 @@ public class LLVMActions extends DemoBaseListener {
        Value v1 = stack.pop();
        Value v2 = stack.pop();
        if( v1.type == v2.type ) {
-	  if( v1.type == VarType.INT ){
+	   if( v1.type == VarType.INT ){
              LLVMGenerator.mult_i32(v1.name, v2.name); 
              stack.push( new Value("%"+(LLVMGenerator.reg-1), VarType.INT) ); 
           }
-	  if( v1.type == VarType.DOUBLE ){
+	   if( v1.type == VarType.DOUBLE ){
              LLVMGenerator.mult_double(v1.name, v2.name); 
              stack.push( new Value("%"+(LLVMGenerator.reg-1), VarType.DOUBLE) );
          }
@@ -111,7 +151,7 @@ public class LLVMActions extends DemoBaseListener {
        stack.push( new Value("%"+(LLVMGenerator.reg-1), VarType.REAL) );
     }*/
 
-    @Override
+    /*@Override
     public void exitPrint(DemoParser.PrintContext ctx) {
        String ID = ctx.ID().getText();
        VarType type = variables.get(ID);
@@ -125,9 +165,31 @@ public class LLVMActions extends DemoBaseListener {
        } else {
           error(ctx.getStart().getLine(), "unknown variable "+ID);
        }
-    }
+    }*/
 
     @Override
+    public void exitPrint(DemoParser.PrintContext ctx) {
+        String ID = ctx.ID().getText();
+        VarType type;
+        if( glob ){
+            type = globals.get(ID);
+        } else {
+            type = locals.get(ID);
+        }
+
+        if( type != null ) {
+            if( type == VarType.INT ){
+                LLVMGenerator.printf_i32(set_variable(ID, type));
+            }
+            if( type == VarType.DOUBLE ){
+                LLVMGenerator.printf_double(set_variable(ID, type));
+            }
+        } else {
+            error(ctx.getStart().getLine(), "unknown variable "+ID);
+        }
+    }
+
+    /*@Override
     public void exitRead(DemoParser.ReadContext ctx) {
         String ID = ctx.ID().getText();
         VarType type = variables.get(ID);
@@ -136,6 +198,12 @@ public class LLVMActions extends DemoBaseListener {
             LLVMGenerator.declare_i32(ID);
         }
         LLVMGenerator.scanf(ID);
+    }*/
+
+    @Override
+    public void exitRead(DemoParser.ReadContext ctx) {
+        String ID = ctx.ID().getText();
+        LLVMGenerator.scanf(set_variable(ID, VarType.INT));
     }
 
     @Override
@@ -152,7 +220,7 @@ public class LLVMActions extends DemoBaseListener {
         LLVMGenerator.ifend();
     }
 
-    @Override
+    /*@Override
     public void exitEqual(DemoParser.EqualContext ctx) {
         String ID = ctx.ID().getText();
         String INT = ctx.expr().getText();
@@ -162,6 +230,13 @@ public class LLVMActions extends DemoBaseListener {
             ctx.getStart().getLine();
             System.err.println("Line "+ ctx.getStart().getLine()+", unknown variable: "+ID);
         }
+    }*/
+
+    @Override
+    public void exitEqual(DemoParser.EqualContext ctx) {
+        String ID = ctx.ID().getText();
+        String INT = ctx.INT().getText();
+        LLVMGenerator.icmp( set_variable(ID, VarType.INT), INT );
     }
 
     /*@Override
@@ -172,7 +247,7 @@ public class LLVMActions extends DemoBaseListener {
     @Override
     public void exitRepetitions(DemoParser.RepetitionsContext ctx) {
         Value v = stack.pop();
-        LLVMGenerator.repeatstart(v.name);
+        LLVMGenerator.repeatstart(v.name, glob);
     }
 
     @Override
@@ -180,6 +255,63 @@ public class LLVMActions extends DemoBaseListener {
         if( ctx.getParent() instanceof DemoParser.RepeatContext ){
             LLVMGenerator.repeatend();
         }
+    }
+
+    @Override
+    public void exitFparam(DemoParser.FparamContext ctx) {
+        String ID = ctx.ID().getText();
+        funcs.add(ID);
+        function = ID;
+        LLVMGenerator.functionstart(ID);
+    }
+
+    @Override
+    public void enterFblock(DemoParser.FblockContext ctx) {
+        glob = false;
+    }
+
+    @Override
+    public void exitFblock(DemoParser.FblockContext ctx) {
+        if( ! locals.containsKey(function) ){
+            LLVMGenerator.assign_i32(set_variable(function, VarType.INT), "0");
+        }
+        LLVMGenerator.load_i32( "%"+function );
+        LLVMGenerator.functionend();
+        locals = new HashMap<String, VarType>();
+        glob = true;
+    }
+
+    @Override
+    public void exitCall(DemoParser.CallContext ctx) {
+        LLVMGenerator.call(ctx.ID().getText());
+    }
+
+    public String set_variable(String ID, VarType TYPE){
+        String id;
+        if( glob ){
+            if( ! globals.containsKey(ID) ) {
+                globals.put(ID, TYPE);
+                if( TYPE == VarType.INT ){
+                    LLVMGenerator.declare_i32(ID, true);
+                }
+                if( TYPE == VarType.DOUBLE ){
+                    LLVMGenerator.declare_double(ID, true);
+                }
+            }
+            id = "@"+ID;
+        } else {
+            if( ! locals.containsKey(ID) ) {
+                locals.put(ID, TYPE);
+                if( TYPE == VarType.INT ){
+                    LLVMGenerator.declare_i32(ID, false);
+                }
+                if( TYPE == VarType.DOUBLE ){
+                    LLVMGenerator.declare_double(ID, false);
+                }
+            }
+            id = "%"+ID;
+        }
+        return id;
     }
 
    void error(int line, String msg){

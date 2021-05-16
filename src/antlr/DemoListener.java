@@ -87,6 +87,48 @@ public interface DemoListener extends ParseTreeListener {
 	 */
 	void exitRead(DemoParser.ReadContext ctx);
 	/**
+	 * Enter a parse tree produced by the {@code call}
+	 * labeled alternative in {@link DemoParser#stat}.
+	 * @param ctx the parse tree
+	 */
+	void enterCall(DemoParser.CallContext ctx);
+	/**
+	 * Exit a parse tree produced by the {@code call}
+	 * labeled alternative in {@link DemoParser#stat}.
+	 * @param ctx the parse tree
+	 */
+	void exitCall(DemoParser.CallContext ctx);
+	/**
+	 * Enter a parse tree produced by {@link DemoParser#function}.
+	 * @param ctx the parse tree
+	 */
+	void enterFunction(DemoParser.FunctionContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link DemoParser#function}.
+	 * @param ctx the parse tree
+	 */
+	void exitFunction(DemoParser.FunctionContext ctx);
+	/**
+	 * Enter a parse tree produced by {@link DemoParser#fparam}.
+	 * @param ctx the parse tree
+	 */
+	void enterFparam(DemoParser.FparamContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link DemoParser#fparam}.
+	 * @param ctx the parse tree
+	 */
+	void exitFparam(DemoParser.FparamContext ctx);
+	/**
+	 * Enter a parse tree produced by {@link DemoParser#fblock}.
+	 * @param ctx the parse tree
+	 */
+	void enterFblock(DemoParser.FblockContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link DemoParser#fblock}.
+	 * @param ctx the parse tree
+	 */
+	void exitFblock(DemoParser.FblockContext ctx);
+	/**
 	 * Enter a parse tree produced by {@link DemoParser#repetitions}.
 	 * @param ctx the parse tree
 	 */
@@ -117,75 +159,63 @@ public interface DemoListener extends ParseTreeListener {
 	 */
 	void exitEqual(DemoParser.EqualContext ctx);
 	/**
-	 * Enter a parse tree produced by the {@code single1}
-	 * labeled alternative in {@link DemoParser#expr}.
-	 * @param ctx the parse tree
-	 */
-	void enterSingle1(DemoParser.Single1Context ctx);
-	/**
-	 * Exit a parse tree produced by the {@code single1}
-	 * labeled alternative in {@link DemoParser#expr}.
-	 * @param ctx the parse tree
-	 */
-	void exitSingle1(DemoParser.Single1Context ctx);
-	/**
 	 * Enter a parse tree produced by the {@code add}
-	 * labeled alternative in {@link DemoParser#expr}.
+	 * labeled alternative in {@link DemoParser#value}.
 	 * @param ctx the parse tree
 	 */
 	void enterAdd(DemoParser.AddContext ctx);
 	/**
 	 * Exit a parse tree produced by the {@code add}
-	 * labeled alternative in {@link DemoParser#expr}.
+	 * labeled alternative in {@link DemoParser#value}.
 	 * @param ctx the parse tree
 	 */
 	void exitAdd(DemoParser.AddContext ctx);
 	/**
-	 * Enter a parse tree produced by the {@code single2}
-	 * labeled alternative in {@link DemoParser#expr1}.
-	 * @param ctx the parse tree
-	 */
-	void enterSingle2(DemoParser.Single2Context ctx);
-	/**
-	 * Exit a parse tree produced by the {@code single2}
-	 * labeled alternative in {@link DemoParser#expr1}.
-	 * @param ctx the parse tree
-	 */
-	void exitSingle2(DemoParser.Single2Context ctx);
-	/**
 	 * Enter a parse tree produced by the {@code mult}
-	 * labeled alternative in {@link DemoParser#expr1}.
+	 * labeled alternative in {@link DemoParser#value}.
 	 * @param ctx the parse tree
 	 */
 	void enterMult(DemoParser.MultContext ctx);
 	/**
 	 * Exit a parse tree produced by the {@code mult}
-	 * labeled alternative in {@link DemoParser#expr1}.
+	 * labeled alternative in {@link DemoParser#value}.
 	 * @param ctx the parse tree
 	 */
 	void exitMult(DemoParser.MultContext ctx);
 	/**
-	 * Enter a parse tree produced by the {@code int}
-	 * labeled alternative in {@link DemoParser#expr2}.
-	 * @param ctx the parse tree
-	 */
-	void enterInt(DemoParser.IntContext ctx);
-	/**
-	 * Exit a parse tree produced by the {@code int}
-	 * labeled alternative in {@link DemoParser#expr2}.
-	 * @param ctx the parse tree
-	 */
-	void exitInt(DemoParser.IntContext ctx);
-	/**
 	 * Enter a parse tree produced by the {@code double}
-	 * labeled alternative in {@link DemoParser#expr2}.
+	 * labeled alternative in {@link DemoParser#value}.
 	 * @param ctx the parse tree
 	 */
 	void enterDouble(DemoParser.DoubleContext ctx);
 	/**
 	 * Exit a parse tree produced by the {@code double}
-	 * labeled alternative in {@link DemoParser#expr2}.
+	 * labeled alternative in {@link DemoParser#value}.
 	 * @param ctx the parse tree
 	 */
 	void exitDouble(DemoParser.DoubleContext ctx);
+	/**
+	 * Enter a parse tree produced by the {@code id}
+	 * labeled alternative in {@link DemoParser#value}.
+	 * @param ctx the parse tree
+	 */
+	void enterId(DemoParser.IdContext ctx);
+	/**
+	 * Exit a parse tree produced by the {@code id}
+	 * labeled alternative in {@link DemoParser#value}.
+	 * @param ctx the parse tree
+	 */
+	void exitId(DemoParser.IdContext ctx);
+	/**
+	 * Enter a parse tree produced by the {@code int}
+	 * labeled alternative in {@link DemoParser#value}.
+	 * @param ctx the parse tree
+	 */
+	void enterInt(DemoParser.IntContext ctx);
+	/**
+	 * Exit a parse tree produced by the {@code int}
+	 * labeled alternative in {@link DemoParser#value}.
+	 * @param ctx the parse tree
+	 */
+	void exitInt(DemoParser.IntContext ctx);
 }
